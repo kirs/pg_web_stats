@@ -15,4 +15,4 @@ Sexy sinatra app for pg_stat_statements.
 
 Made by [Kir Shatrov](https://github.com/kirs), sponsored by [Evil Martians](http://evl.ms).
 
-Thanks [evtuhovich](https://twitter.com/evtuhovich) for advice about making this project.
+Thanks to [Ivan Evtuhovich](https://twitter.com/evtuhovich) for advice about making this app.
