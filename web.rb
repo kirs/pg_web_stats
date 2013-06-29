@@ -8,14 +8,14 @@ require 'pg_web_stats'
 pg_web_stats = PgWebStats.new("config.yml")
 
 helpers do
-  def sort_link(title, key)
+  def sort_link(title, key, alt_title = nil)
     direction = if params[:order_by] == key && params[:direction] == "desc"
       "asc"
     else
       "desc"
     end
 
-    "<a href='?order_by=#{key}&direction=#{direction}'>#{title}</a>"
+    "<a href='?order_by=#{key}&direction=#{direction}' title='#{alt_title}'>#{title}</a>"
   end
 end
 
