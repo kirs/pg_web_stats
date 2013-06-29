@@ -1,0 +1,5 @@
+user: foo
+password: bar
+database: rails_development
+host: localhost
+port:
