@@ -1,6 +1,8 @@
 pg_web_stats
 ============
 
+![](http://f.cl.ly/items/1M2D402O0E0c0p2Y461E/Screen%20Shot%202013-06-29%20at%2012.30.22.png)
+
 Sexy sinatra app for pg_stat_statements.
 
 ## Installation
