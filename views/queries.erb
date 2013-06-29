@@ -13,6 +13,8 @@
     <th><%= sort_link 'lbd', 'local_blks_dirtied', 'local_blks_dirtied' %></th>
     <th><%= sort_link 'tbr', 'temp_blks_read', 'temp_blks_read' %></th>
     <th><%= sort_link 'tbw', 'temp_blks_written', 'temp_blks_written' %></th>
+    <th><%= sort_link 'brt', 'blk_read_time', 'blk_read_time' %></th>
+    <th><%= sort_link 'bwt', 'blk_write_time', 'blk_write_time' %></th>
   </tr>
   <% @stats.each do |row| %>
     <tr class="<%= row.waste? ? '' : 'success' %>">
@@ -29,6 +31,8 @@
       <td><%= row.local_blks_dirtied %></td>
       <td><%= row.temp_blks_read %></td>
       <td><%= row.temp_blks_written %></td>
+      <td><%= row.blk_read_time %></td>
+      <td><%= row.blk_write_time %></td>
     </tr>
   <% end %>
 </table>
