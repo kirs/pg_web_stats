@@ -80,7 +80,6 @@ class PgWebStats
 
     query += " ORDER BY #{order_by}"
 
-    puts query
     query
   end
 
