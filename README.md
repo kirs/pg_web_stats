@@ -5,6 +5,12 @@ pg_web_stats
 
 Sexy sinatra app for pg_stat_statements.
 
+### Features
+
+* Sorting by any column from pg_stat_statements
+* Filtering by database or user
+* Highlighting important queries && hidding not important queries
+
 ## Installation
 
 0. Prepare your PG setup: enable the `pg_stat_statements` extension and execute `CREATE EXTENSION pg_stat_statements` inside the database you want to inspect. *Hint: there is an [awesome article about pg_stat_statements in russian](http://evtuhovich.ru/blog/2013/06/28/pg-stat-statements/#comment-945382408).*
