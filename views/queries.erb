@@ -1,5 +1,25 @@
+<form method="GET" action="/">
+  <select name="dbid">
+    <option value=""></option>
+    <% @databases.each do |item| %>
+      <option value="<%= item[0] %>" <%= params[:dbid] == item[0] ? "selected" : "" %>><%= item[1] %></option>
+    <% end %>
+  </select>
+
+  <select name="userid">
+    <option value=""></option>
+    <% @users.each do |item| %>
+      <option value="<%= item[0] %>" <%= params[:userid] == item[0] ? "selected" : "" %>><%= item[1] %></option>
+    <% end %>
+  </select>
+
+  <input type="submit" name="submit" value="Filter">
+</form>
+
 <table class="table table-compact">
   <tr>
+    <th>dbid</th>
+    <th>userid</th>
     <th><%= sort_link 'query', 'query' %></a></th>
     <th><%= sort_link 'calls', 'calls' %></th>
     <th><%= sort_link 'time', 'total_time' %></th>
@@ -18,6 +38,8 @@
   </tr>
   <% @stats.each do |row| %>
     <tr class="<%= row.waste? ? '' : 'success' %>">
+      <td><%= row.db %></td>
+      <td><%= row.user %></td>
       <td><%= row.query %></td>
       <td><%= row.calls %></td>
       <td><%= row.total_time %></td>

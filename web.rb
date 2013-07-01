@@ -15,7 +15,11 @@ helpers do
       "desc"
     end
 
-    "<a href='?order_by=#{key}&direction=#{direction}' title='#{alt_title}'>#{title}</a>"
+    url = "?order_by=#{key}&direction=#{direction}"
+    url += "&userid=#{params[:userid]}" if params[:userid]
+    url += "&dbid=#{params[:dbid]}" if params[:dbid]
+
+    "<a href='#{url}' title='#{alt_title}'>#{title}</a>"
   end
 end
 
@@ -26,7 +30,14 @@ get '/' do
     "total_time desc"
   end
 
-  @stats = pg_web_stats.get_stats(order_by)
+  @stats = pg_web_stats.get_stats(
+    order: order_by,
+    userid: params[:userid],
+    dbid: params[:dbid]
+  )
+
+  @databases = pg_web_stats.databases
+  @users = pg_web_stats.users
 
   erb :queries, layout: :application
 end
