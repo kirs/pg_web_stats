@@ -1,11 +1,12 @@
-<form method="GET" action="/">
+<form method="GET" action="/" class="form-inline">
+  Filter by db:
   <select name="dbid">
     <option value=""></option>
     <% @databases.each do |item| %>
       <option value="<%= item[0] %>" <%= params[:dbid] == item[0] ? "selected" : "" %>><%= item[1] %></option>
     <% end %>
   </select>
-
+  and by user:
   <select name="userid">
     <option value=""></option>
     <% @users.each do |item| %>
@@ -13,7 +14,7 @@
     <% end %>
   </select>
 
-  <input type="submit" name="submit" value="Filter">
+  <input type="submit" name="submit" value="Filter" class="btn">
 </form>
 
 <table class="table table-compact">
