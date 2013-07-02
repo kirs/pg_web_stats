@@ -30,7 +30,7 @@ class PgWebStats
   def users
     unless @users
       @users = {}
-      connection.exec("select oid, rolname from pg_authid;") do |result|
+      connection.exec("select oid, rolname from pg_authid order by rolname;") do |result|
         result.each do |row|
           @users[row['oid']] = row['rolname']
         end
@@ -44,7 +44,7 @@ class PgWebStats
   def databases
     unless @databases
       @databases = {}
-      connection.exec("select oid, datname from pg_database;") do |result|
+      connection.exec("select oid, datname from pg_database order by datname;") do |result|
         result.each do |row|
           @databases[row['oid']] = row['datname']
         end
