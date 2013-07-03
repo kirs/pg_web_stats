@@ -5,7 +5,7 @@ require 'yaml'
 $:.unshift File.dirname(__FILE__)
 require 'pg_web_stats'
 
-pg_web_stats = PgWebStats.new("config.yml")
+pg_web_stats = PgWebStats.new
 
 helpers do
   def sort_link(title, key, alt_title = nil)

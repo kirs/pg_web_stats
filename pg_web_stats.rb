@@ -1,7 +1,7 @@
 class PgWebStats
   attr_accessor :config, :connection
 
-  def initialize(config_path)
+  def initialize(config_path = 'config.yml')
     self.config = YAML.load_file(config_path)
     self.connection = PG.connect(
       dbname: config['database'],
