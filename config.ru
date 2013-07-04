@@ -1,11 +1,7 @@
-require 'pg'
 require 'sinatra'
 require 'yaml'
 
-$:.unshift File.dirname(__FILE__)
-require 'pg_web_stats'
-
-pg_web_stats = PgWebStats.new("config.yml")
+require './setup'
 
 helpers do
   def sort_link(title, key, alt_title = nil)
@@ -30,14 +26,16 @@ get '/' do
     "total_time desc"
   end
 
-  @stats = pg_web_stats.get_stats(
+  @stats = PG_WEB_STATS.get_stats(
     order: order_by,
     userid: params[:userid],
     dbid: params[:dbid]
   )
 
-  @databases = pg_web_stats.databases
-  @users = pg_web_stats.users
+  @databases = PG_WEB_STATS.databases
+  @users = PG_WEB_STATS.users
 
   erb :queries, layout: :application
 end
+
+run Sinatra::Application
