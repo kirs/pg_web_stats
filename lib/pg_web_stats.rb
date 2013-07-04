@@ -1,7 +1,9 @@
+require 'pg'
+
 class PgWebStats
   attr_accessor :config, :connection
 
-  def initialize(config_path)
+  def initialize(config_path = 'config.yml')
     self.config = YAML.load_file(config_path)
     self.connection = PG.connect(
       dbname: config['database'],
@@ -10,11 +12,9 @@ class PgWebStats
       password: config['password'],
       port: config['port']
     )
-
-    # create_extension
   end
 
-  def get_stats(params)
+  def get_stats(params = {order:"total_time desc"})
     query = build_stats_query(params)
 
     results = []
@@ -28,34 +28,25 @@ class PgWebStats
   end
 
   def users
-    unless @users
-      @users = {}
-      connection.exec("select oid, rolname from pg_authid order by rolname;") do |result|
-        result.each do |row|
-          @users[row['oid']] = row['rolname']
-        end
-      end
-      @users
-    end
-
-    @users
+    @users ||= select_by_oid("select oid, rolname from pg_authid order by rolname;", 'rolname')
   end
 
   def databases
-    unless @databases
-      @databases = {}
-      connection.exec("select oid, datname from pg_database order by datname;") do |result|
-        result.each do |row|
-          @databases[row['oid']] = row['datname']
-        end
-      end
-      @databases
-    end
-
-    @databases
+    @databases ||= select_by_oid("select oid, datname from pg_database order by datname;", 'datname')
   end
 
   private
+
+  def select_by_oid(select_query, row_name)
+    @selection = {}
+    connection.exec(select_query) do |result|
+      result.each do |row|
+        @selection[row['oid']] = row[row_name]
+      end
+    end
+
+    @selection
+  end
 
   def build_stats_query(params)
     order_by = params[:order]
@@ -81,10 +72,6 @@ class PgWebStats
     query += " ORDER BY #{order_by}"
 
     query
-  end
-
-  def create_extension
-    connection.exec('CREATE EXTENSION pg_stat_statements')
   end
 end
 
