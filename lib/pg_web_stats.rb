@@ -1,4 +1,5 @@
 require 'pg'
+require 'coderay'
 
 class PgWebStats
   attr_accessor :config, :connection
@@ -106,6 +107,10 @@ class PgWebStats::Row
 
   def db
     databases[dbid]
+  end
+
+  def query
+    CodeRay.scan(data["query"].gsub(/\s+/, ' ').strip, "sql").div(:css => :class)
   end
 
   def waste?
