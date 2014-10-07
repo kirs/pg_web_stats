@@ -1,5 +1,4 @@
 source 'https://rubygems.org'
 
-gem 'pg'
-gem 'sinatra'
-gem 'pry'
+# Specify your gem's dependencies in pg_web_stats.gemspec
+gemspec
