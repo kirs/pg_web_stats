@@ -2,6 +2,7 @@ PATH
   remote: .
   specs:
     pg_web_stats (0.0.1)
+      coderay
       pg
       sinatra
 
