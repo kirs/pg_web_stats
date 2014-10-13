@@ -1,21 +1,23 @@
 require 'pg'
 require 'coderay'
+require 'yaml'
 
 class PgWebStats
   attr_accessor :config, :connection
 
   def initialize(config_path = 'config.yml')
-    self.config = YAML.load_file(config_path)
+    hash = config_path.is_a?(Hash) ? config_path : YAML.load_file(config_path)
+    self.config = Hash[hash.map{ |k, v| [k.to_s, v] }]
     self.connection = PG.connect(
       dbname: config['database'],
       host: config['host'],
-      user: config['user'],
+      user: config['user'] || config['username'],
       password: config['password'],
       port: config['port']
     )
   end
 
-  def get_stats(params = {order:"total_time desc"})
+  def get_stats(params = { order: "total_time desc" })
     query = build_stats_query(params)
 
     results = []
@@ -54,18 +56,21 @@ class PgWebStats
 
     query = "SELECT * FROM pg_stat_statements"
 
-    # TODO escape values from user
-
     where_conditions = []
 
     userid = params[:userid]
     if userid && !userid.empty?
-      where_conditions << "userid='#{userid}'"
+      where_conditions << "userid='#{userid.gsub("'", "''")}'"
     end
 
     dbid = params[:dbid]
     if dbid && !dbid.empty?
-      where_conditions << "dbid='#{dbid}'"
+      where_conditions << "dbid='#{dbid.gsub("'", "''")}'"
+    end
+
+    q = params[:q]
+    if q && !q.empty?
+      where_conditions << "query LIKE '#{q.gsub("'", "''")}%'"
     end
 
     query += " WHERE #{where_conditions.join(" AND ")}" if where_conditions.size > 0

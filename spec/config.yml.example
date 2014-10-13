@@ -1,5 +1,4 @@
 user: foo
 password: bar
-database: rails_development
+database: pg_web_stats_test
 host: localhost
-port:

@@ -20,7 +20,43 @@ Sexy sinatra app for [pg_stat_statements](http://www.postgresql.org/docs/9.2/sta
 4. ???
 5. PROFIT
 
+## Mount inside a rails app
 
+Add this line to your application's Gemfile:
+
+    gem 'pg_web_stats', require: 'pg_web_stats_app'
+
+Or if gem is not released yet
+
+    gem 'pg_web_stats', git: 'https://github.com/shhavel/pg_web_stats', require: 'pg_web_stats_app'
+
+And then execute:
+
+    $ bundle
+
+Create file config/initializers/pg_web_stats.rb
+
+```ruby
+# Configure database connection
+config_hash = YAML.load_file(Rails.root.join('config', 'database.yml'))[Rails.env]
+PG_WEB_STATS = PgWebStats.new(config_hash)
+
+# Restrict access to pg_web_stats with Basic Authentication
+# (or use any other authentication system).
+PgWebStatsApp.use(Rack::Auth::Basic) do |user, password|
+  password == "secret"
+end
+```
+
+Add to routes.rb
+
+```ruby
+mount PgWebStatsApp, at: '/pg_stats'
+```
+
+Restart rails app and visit [http://localhost:3000/pg_stats](http://localhost:3000/pg_stats)
+
+<hr />
 Made by [Kir Shatrov](https://github.com/kirs), sponsored by [Evil Martians](http://evl.ms).
 
 Thanks to [Ivan Evtuhovich](https://twitter.com/evtuhovich) for advice about making this app.

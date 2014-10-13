@@ -18,3 +18,4 @@ tmp
 _yardoc
 doc/
 config.yml
+spec/config.yml

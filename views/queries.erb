@@ -1,4 +1,4 @@
-<form method="GET" action="/" class="form-inline">
+<form method="GET" class="form-inline">
   Filter by db:
   <select name="dbid">
     <option value=""></option>
@@ -13,6 +13,8 @@
       <option value="<%= item[0] %>" <%= params[:userid] == item[0] ? "selected" : "" %>><%= item[1] %></option>
     <% end %>
   </select>
+  query starts from:
+  <input type="text" name="q" value="<%= params[:query].to_s.gsub('"', '&quot;') %>"/>
 
   <input type="submit" name="submit" value="Filter" class="btn">
 </form>
