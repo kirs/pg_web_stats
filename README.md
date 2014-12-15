@@ -5,6 +5,9 @@ pg_web_stats
 
 Sexy sinatra app for [pg_stat_statements](http://www.postgresql.org/docs/9.2/static/pgstatstatements.html). [![Code Climate](https://codeclimate.com/github/kirs/pg_web_stats.png)](https://codeclimate.com/github/kirs/pg_web_stats)
 
+<a href="https://evilmartians.com/">
+<img src="https://evilmartians.com/badges/sponsored-by-evil-martians.svg" alt="Sponsored by Evil Martians" width="236" height="54"></a>
+
 ### Features
 
 * Sorting by any column from pg_stat_statements
