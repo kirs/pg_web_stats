@@ -1,0 +1,11 @@
+*
+
+!Gemfile
+!Gemfile.lock
+!Rakefile
+!config.ru
+!lib
+!pg_web_stats.gemspec
+!setup.rb
+!spec
+!views
