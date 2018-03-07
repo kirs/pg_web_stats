@@ -7,7 +7,6 @@ COPY . /pg_web_stats/
 RUN set -ex; \
     mkdir /etc/pg_web_stats; \
     ln -sf /etc/pg_web_stats/config.yml /pg_web_stats/config.yml; \
-    gem install bundler; \
     bundle install
 
 CMD ["rake", "server"]
