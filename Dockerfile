@@ -1,6 +1,6 @@
 FROM ruby:1.9
 
-EXPOSE 3000
+EXPOSE 9292
 
 WORKDIR /pg_web_stats
 COPY . /pg_web_stats/
