@@ -1,12 +1,14 @@
-FROM ruby:1.9
-
-EXPOSE 9292
+FROM ruby:2.5
 
 WORKDIR /pg_web_stats
-COPY . /pg_web_stats/
-RUN set -ex; \
-    mkdir /etc/pg_web_stats; \
-    ln -sf /etc/pg_web_stats/config.yml /pg_web_stats/config.yml; \
-    bundle install
 
+ENV RACK_ENV=production
+COPY Gemfile Gemfile.lock pg_web_stats.gemspec /pg_web_stats/
+RUN bundle install
+
+COPY . /pg_web_stats/
+RUN mkdir /etc/pg_web_stats \
+ && ln -sf /etc/pg_web_stats/config.yml /pg_web_stats/config.yml
+
+EXPOSE 9292
 CMD ["rake", "server"]

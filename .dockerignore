@@ -1,11 +1,24 @@
-*
+.git
+.gitignore
 
-!Gemfile
-!Gemfile.lock
-!Rakefile
-!config.ru
-!lib
-!pg_web_stats.gemspec
-!setup.rb
-!spec
-!views
+.DS_Store
+*.gem
+*.rbc
+.bundle
+.config
+coverage
+InstalledFiles
+lib/bundler/man
+pkg
+rdoc
+spec/reports
+test/tmp
+test/version_tmp
+tmp
+
+# YARD artifacts
+.yardoc
+_yardoc
+doc/
+config.yml
+spec/config.yml
