@@ -60,17 +60,17 @@ class PgWebStats
 
     userid = params[:userid]
     if userid && !userid.empty?
-      where_conditions << "userid='#{userid.gsub("'", "''")}'"
+      where_conditions << "userid='#{connection.escape_string(userid)}'"
     end
 
     dbid = params[:dbid]
     if dbid && !dbid.empty?
-      where_conditions << "dbid='#{dbid.gsub("'", "''")}'"
+      where_conditions << "dbid='#{connection.escape_string(dbid)}'"
     end
 
     q = params[:q]
     if q && !q.empty?
-      where_conditions << "query LIKE '#{q.gsub("'", "''")}%'"
+      where_conditions << "query LIKE '#{connection.escape_string(q)}%'"
     end
 
     query += " WHERE #{where_conditions.join(" AND ")}" if where_conditions.size > 0
