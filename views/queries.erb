@@ -1,13 +1,13 @@
 <form method="GET" class="form-inline">
   Filter by db:
-  <select name="dbid">
+  <select name="dbid" class="input-medium">
     <option value=""></option>
     <% @databases.each do |item| %>
       <option value="<%= item[0] %>" <%= params[:dbid] == item[0] ? "selected" : "" %>><%= item[1] %></option>
     <% end %>
   </select>
   and by user:
-  <select name="userid">
+  <select name="userid" class="input-medium">
     <option value=""></option>
     <% @users.each do |item| %>
       <option value="<%= item[0] %>" <%= params[:userid] == item[0] ? "selected" : "" %>><%= item[1] %></option>
@@ -15,15 +15,21 @@
   </select>
   query starts from:
   <input type="text" name="q" value="<%= params[:query].to_s.gsub('"', '&quot;') %>"/>
-
-  <input type="submit" name="submit" value="Filter" class="btn">
+  with
+  <select name="count" class="input-mini">
+    <% [10, 25, 50, 100, 200, 250, 500, 750, 1000].each do |item| %>
+      <option value="<%= item %>" <%= params[:count] == item ? "selected" : "" %>><%= item %></option>
+    <% end %>
+  </select>
+  items per&nbsp;page
+  <button type="submit" class="btn">Filter</button>
 </form>
 
 <table class="table table-compact">
   <tr>
     <th>dbid</th>
     <th>userid</th>
-    <th><%= sort_link 'query', 'query' %></a></th>
+    <th><%= sort_link 'query', 'query' %></th>
     <th><%= sort_link 'calls', 'calls' %></th>
     <th><%= sort_link 'time', 'total_time' %></th>
     <th><%= sort_link 'rows', 'rows' %></th>
@@ -39,7 +45,7 @@
     <th><%= sort_link 'brt', 'blk_read_time', 'blk_read_time' %></th>
     <th><%= sort_link 'bwt', 'blk_write_time', 'blk_write_time' %></th>
   </tr>
-  <% @stats.each do |row| %>
+  <% @stats[:items].each do |row| %>
     <tr class="<%= row.waste? ? '' : 'success' %>">
       <% %w(db user query calls total_time rows shared_blks_hit shared_blks_read
         shared_blks_dirtied shared_blks_written local_blks_hit local_blks_read
@@ -50,3 +56,9 @@
     </tr>
   <% end %>
 </table>
+
+<div class="pagination"><ul>
+  <% page_links.each do |link| %>
+    <%= page_link link %>
+  <% end %>
+</ul></div>
