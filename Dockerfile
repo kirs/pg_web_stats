@@ -11,4 +11,4 @@ RUN mkdir /etc/pg_web_stats \
  && ln -sf /etc/pg_web_stats/config.yml /pg_web_stats/config.yml
 
 EXPOSE 9292
-CMD ["rake", "server"]
+CMD ["bundle", "exec", "rackup", "--host", "0.0.0.0", "--port", "9292"]
