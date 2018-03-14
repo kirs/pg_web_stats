@@ -62,6 +62,10 @@ class PgWebStatsApp < Sinatra::Base
   end
 
   get '/' do
+    redirect '/' + PG_WEB_STATS.default_server + '/', 307
+  end
+
+  get '/:server/' do |server|
     param :q,          String
     param :userid,     String, format: /^\d*$/
     param :dbid,       String, format: /^\d*$/
@@ -73,9 +77,9 @@ class PgWebStatsApp < Sinatra::Base
     all_keys = %w{q userid dbid count offset order_by direction}
     params.select {|key| all_keys.include? key}
 
-    @stats = PG_WEB_STATS.get_stats(params)
-    @databases = PG_WEB_STATS.databases
-    @users = PG_WEB_STATS.users
+    @stats = PG_WEB_STATS.get_stats(server, params)
+    @databases = PG_WEB_STATS.databases(server)
+    @users = PG_WEB_STATS.users(server)
 
     erb :queries, layout: :application
   end

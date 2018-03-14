@@ -3,53 +3,62 @@ require 'coderay'
 require 'yaml'
 
 class PgWebStats
-  attr_accessor :config, :connection
+  attr_accessor :default_server, :connections
 
   def initialize(config_path = 'config.yml')
     hash = config_path.is_a?(Hash) ? config_path : YAML.load_file(config_path)
-    self.config = Hash[hash.map{ |k, v| [k.to_s, v] }]
-    self.connection = PG.connect(
-      dbname: config['database'],
-      host: config['host'],
-      user: config['user'] || config['username'],
-      password: config['password'],
-      port: config['port']
-    )
+
+    self.default_server = nil
+    self.connections = Hash.new
+    hash.each do |name, config|
+      self.default_server = name unless self.default_server
+      self.connections[name] = PG.connect(
+        dbname: config['database'],
+        host: config['host'],
+        user: config['user'] || config['username'],
+        password: config['password'],
+        port: config['port']
+      )
+    end
+    if self.connections.length < 1
+      raise RuntimeError, "configuration must contain at least one server"
+    end
   end
 
-  def get_stats(params = { order: "total_time desc" })
-    query = build_stats_query_base("COUNT(*) AS count", params)
+  def get_stats(server, params = { order: "total_time desc" })
+    connection = connections[server]
+    query = build_stats_query_base(connection, "COUNT(*) AS count", params)
 
     count = 0
     connection.exec(query) do |result|
       count = result[0]["count"].to_i
     end
 
-    query = build_stats_query("*", params)
+    query = build_stats_query(connection, "*", params)
 
     results = []
     connection.exec(query) do |result|
       result.each do |row|
-        results << Row.new(row, users, databases)
+        results << Row.new(row, users(server), databases(server))
       end
     end
 
     {total: count, items: results}
   end
 
-  def users
-    @users ||= select_by_oid("select oid, rolname from pg_authid order by rolname;", 'rolname')
+  def users(server)
+    @users ||= select_by_oid(server, "select oid, rolname from pg_authid order by rolname;", 'rolname')
   end
 
-  def databases
-    @databases ||= select_by_oid("select oid, datname from pg_database order by datname;", 'datname')
+  def databases(server)
+    @databases ||= select_by_oid(server, "select oid, datname from pg_database order by datname;", 'datname')
   end
 
   private
 
-  def select_by_oid(select_query, row_name)
+  def select_by_oid(server, select_query, row_name)
     @selection = {}
-    connection.exec(select_query) do |result|
+    connections[server].exec(select_query) do |result|
       result.each do |row|
         @selection[row['oid']] = row[row_name]
       end
@@ -58,7 +67,7 @@ class PgWebStats
     @selection
   end
 
-  def build_stats_query_base(what, params)
+  def build_stats_query_base(connection, what, params)
     query = "SELECT #{what} FROM pg_stat_statements"
 
     where_conditions = []
@@ -83,10 +92,10 @@ class PgWebStats
     query
   end
 
-  def build_stats_query(what, params)
+  def build_stats_query(connection, what, params)
     order_by = params[:order]
 
-    query = build_stats_query_base("*", params)
+    query = build_stats_query_base(connection, "*", params)
 
     order_by = if params[:order_by] && params[:direction]
       "#{params[:order_by]} #{params[:direction]}"
