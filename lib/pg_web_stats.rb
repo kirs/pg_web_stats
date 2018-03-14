@@ -47,11 +47,23 @@ class PgWebStats
   end
 
   def users(server)
-    @users ||= select_by_oid(server, "select oid, rolname from pg_authid order by rolname;", 'rolname')
+    @users ||= Hash.new
+
+    if not @users.has_key? server
+      @users[server] = select_by_oid(server, "select oid, rolname from pg_authid order by rolname;", 'rolname')
+    end
+
+    @users[server]
   end
 
   def databases(server)
-    @databases ||= select_by_oid(server, "select oid, datname from pg_database order by datname;", 'datname')
+    @databases ||= Hash.new
+
+    if not @databases.has_key? server
+      @databases[server] = select_by_oid(server, "select oid, datname from pg_database order by datname;", 'datname')
+    end
+
+    @databases[server]
   end
 
   private
