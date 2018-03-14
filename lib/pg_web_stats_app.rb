@@ -62,7 +62,12 @@ class PgWebStatsApp < Sinatra::Base
   end
 
   get '/' do
-    redirect '/' + PG_WEB_STATS.default_server + '/', 307
+    @servers = PG_WEB_STATS.connections.keys
+    if @servers.length == 1
+      redirect '/' + PG_WEB_STATS.default_server + '/', 307
+    else
+      erb :servers, layout: :application
+    end
   end
 
   get '/:server/' do |server|
@@ -76,6 +81,10 @@ class PgWebStatsApp < Sinatra::Base
 
     all_keys = %w{q userid dbid count offset order_by direction}
     params.select {|key| all_keys.include? key}
+
+    if not PG_WEB_STATS.connections.has_key? server
+      halt(404)
+    end
 
     @stats = PG_WEB_STATS.get_stats(server, params)
     @databases = PG_WEB_STATS.databases(server)
