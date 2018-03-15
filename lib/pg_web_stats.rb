@@ -25,6 +25,10 @@ class PgWebStats
     end
   end
 
+  def reset_stats(server)
+    connections[server].exec("SELECT pg_stat_statements_reset()")
+  end
+
   def get_stats(server, params = { order: "total_time desc" })
     connection = connections[server]
     query = build_stats_query_base(connection, "COUNT(*) AS count", params)

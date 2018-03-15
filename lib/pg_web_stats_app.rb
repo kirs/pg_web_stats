@@ -70,6 +70,11 @@ class PgWebStatsApp < Sinatra::Base
     end
   end
 
+  post '/:server/reset-stats/' do |server|
+    PG_WEB_STATS.reset_stats(server)
+    redirect "/#{server}/", 303
+  end
+
   get '/:server/' do |server|
     param :q,          String
     param :userid,     String, format: /^\d*$/
@@ -90,6 +95,6 @@ class PgWebStatsApp < Sinatra::Base
     @databases = PG_WEB_STATS.databases(server)
     @users = PG_WEB_STATS.users(server)
 
-    erb :queries, layout: :application
+    erb :queries, layout: :application, locals: {server: server}
   end
 end

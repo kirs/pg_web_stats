@@ -57,6 +57,19 @@
   <% end %>
 </table>
 
+<form method="post" id="reset-stats-form" action="/<%= server %>/reset-stats/" class="pull-right">
+  <button type="submit" class="btn btn-danger btn-small">
+    <i class="icon-fire icon-white"></i>&nbsp;Reset
+  </button>
+  <script>
+    document.getElementById("reset-stats-form").addEventListener("submit", function (ev) {
+      if (!window.confirm("Are you sure you want to clear stats?")) {
+        ev.preventDefault();
+      }
+    });
+  </script>
+</form>
+
 <div class="pagination"><ul>
   <% page_links.each do |link| %>
     <%= page_link link %>
