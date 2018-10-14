@@ -3,7 +3,7 @@ pg_web_stats
 
 ![](http://f.cl.ly/items/1M2D402O0E0c0p2Y461E/Screen%20Shot%202013-06-29%20at%2012.30.22.png)
 
-Sexy sinatra app for [pg_stat_statements](http://www.postgresql.org/docs/9.2/static/pgstatstatements.html). [![Code Climate](https://codeclimate.com/github/kirs/pg_web_stats.png)](https://codeclimate.com/github/kirs/pg_web_stats)
+Mountable Sinatra app to render [pg_stat_statements](http://www.postgresql.org/docs/9.2/static/pgstatstatements.html) in user friendly way. [![Code Climate](https://codeclimate.com/github/kirs/pg_web_stats.png)](https://codeclimate.com/github/kirs/pg_web_stats)
 
 <a href="https://evilmartians.com/">
 <img src="https://evilmartians.com/badges/sponsored-by-evil-martians.svg" alt="Sponsored by Evil Martians" width="236" height="54"></a>
