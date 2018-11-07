@@ -1,5 +1,6 @@
-user: foo
-password: bar
-database: rails_development
-host: localhost
-port:
+default:
+  user: postgres
+  password:
+  database: postgres
+  host: postgres
+  port: 5432

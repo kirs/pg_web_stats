@@ -3,46 +3,78 @@ require 'coderay'
 require 'yaml'
 
 class PgWebStats
-  attr_accessor :config, :connection
+  attr_accessor :default_server, :connections
 
   def initialize(config_path = 'config.yml')
     hash = config_path.is_a?(Hash) ? config_path : YAML.load_file(config_path)
-    self.config = Hash[hash.map{ |k, v| [k.to_s, v] }]
-    self.connection = PG.connect(
-      dbname: config['database'],
-      host: config['host'],
-      user: config['user'] || config['username'],
-      password: config['password'],
-      port: config['port']
-    )
+
+    self.default_server = nil
+    self.connections = Hash.new
+    hash.each do |name, config|
+      self.default_server = name unless self.default_server
+      self.connections[name] = PG.connect(
+        dbname: config['database'],
+        host: config['host'],
+        user: config['user'] || config['username'],
+        password: config['password'],
+        port: config['port']
+      )
+    end
+    if self.connections.length < 1
+      raise RuntimeError, "configuration must contain at least one server"
+    end
   end
 
-  def get_stats(params = { order: "total_time desc" })
-    query = build_stats_query(params)
+  def reset_stats(server)
+    connections[server].exec("SELECT pg_stat_statements_reset()")
+  end
+
+  def get_stats(server, params = { order: "total_time desc" })
+    connection = connections[server]
+    query = build_stats_query_base(connection, "COUNT(*) AS count", params)
+
+    count = 0
+    connection.exec(query) do |result|
+      count = result[0]["count"].to_i
+    end
+
+    query = build_stats_query(connection, "*", params)
 
     results = []
     connection.exec(query) do |result|
       result.each do |row|
-        results << Row.new(row, users, databases)
+        results << Row.new(row, users(server), databases(server))
       end
     end
 
-    results
+    {total: count, items: results}
   end
 
-  def users
-    @users ||= select_by_oid("select oid, rolname from pg_authid order by rolname;", 'rolname')
+  def users(server)
+    @users ||= Hash.new
+
+    if not @users.has_key? server
+      @users[server] = select_by_oid(server, "select oid, rolname from pg_authid order by rolname;", 'rolname')
+    end
+
+    @users[server]
   end
 
-  def databases
-    @databases ||= select_by_oid("select oid, datname from pg_database order by datname;", 'datname')
+  def databases(server)
+    @databases ||= Hash.new
+
+    if not @databases.has_key? server
+      @databases[server] = select_by_oid(server, "select oid, datname from pg_database order by datname;", 'datname')
+    end
+
+    @databases[server]
   end
 
   private
 
-  def select_by_oid(select_query, row_name)
+  def select_by_oid(server, select_query, row_name)
     @selection = {}
-    connection.exec(select_query) do |result|
+    connections[server].exec(select_query) do |result|
       result.each do |row|
         @selection[row['oid']] = row[row_name]
       end
@@ -51,31 +83,49 @@ class PgWebStats
     @selection
   end
 
-  def build_stats_query(params)
-    order_by = params[:order]
-
-    query = "SELECT * FROM pg_stat_statements"
+  def build_stats_query_base(connection, what, params)
+    query = "SELECT #{what} FROM pg_stat_statements"
 
     where_conditions = []
 
     userid = params[:userid]
     if userid && !userid.empty?
-      where_conditions << "userid='#{userid.gsub("'", "''")}'"
+      where_conditions << "userid=#{userid}"
     end
 
     dbid = params[:dbid]
     if dbid && !dbid.empty?
-      where_conditions << "dbid='#{dbid.gsub("'", "''")}'"
+      where_conditions << "dbid=#{dbid}"
     end
 
     q = params[:q]
     if q && !q.empty?
-      where_conditions << "query LIKE '#{q.gsub("'", "''")}%'"
+      where_conditions << "query LIKE '#{connection.escape_string(q)}%'"
     end
 
     query += " WHERE #{where_conditions.join(" AND ")}" if where_conditions.size > 0
 
+    query
+  end
+
+  def build_stats_query(connection, what, params)
+    order_by = params[:order]
+
+    query = build_stats_query_base(connection, "*", params)
+
+    order_by = if params[:order_by] && params[:direction]
+      "#{params[:order_by]} #{params[:direction]}"
+    else
+      "total_time desc"
+    end
     query += " ORDER BY #{order_by}"
+
+    count = params[:count] ? params[:count].clamp(1, 1000) : 25
+    query += " LIMIT #{count}"
+
+    if params[:offset] > 0
+      query += " OFFSET #{params[:offset]}"
+    end
 
     query
   end

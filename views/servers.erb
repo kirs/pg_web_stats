@@ -1,0 +1,6 @@
+<h4>Servers</h4>
+<ul>
+  <% @servers.each do |name| %>
+    <li><a href="/<%= URI.escape(name) %>/"><%= name %></a></li>
+  <% end %>
+</ul>
